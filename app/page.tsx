@@ -19,7 +19,7 @@ export default function Home() {
   const [selectedCard, setSelectedCard] = useState<Card | null>(null)
   const [posX, setPosX] = useState<number | null>(null)
   const [posY, setPosY] = useState<number | null>(null)
-  const [fontSize, setFontSize] = useState<number>(115)
+  const [fontSize, setFontSize] = useState<number>(55)
   const [selectedOccasion, setSelectedOccasion] = useState<string | null>(null)
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const [imageLoaded, setImageLoaded] = useState(false)
@@ -58,8 +58,8 @@ export default function Home() {
     // Draw Background
     ctx.drawImage(img, 0, 0)
 
-    // Draw Text
-    ctx.font = `${fontSize || 115}px Almarai, sans-serif`
+    // Use slider value directly as font size (40-70px)
+    ctx.font = `${fontSize}px Almarai, sans-serif`
     ctx.fillStyle = selectedCard.txtColor || "#4A5456"
     ctx.textAlign = "center"
     ctx.textBaseline = "middle"
@@ -105,6 +105,33 @@ export default function Home() {
     a.download = `${name || "greeting"}.jpg`
     a.click()
     setStep("name")
+  }
+
+  const handleShare = async () => {
+    const canvas = canvasRef.current
+    if (!canvas) return
+
+    canvas.toBlob(async (blob) => {
+      if (!blob) return
+      const file = new File([blob], `${name || "greeting"}.jpg`, { type: "image/jpeg" })
+
+      if (navigator.canShare && navigator.canShare({ files: [file] })) {
+        try {
+          await navigator.share({
+            files: [file],
+            title: 'بطاقة تهنئة',
+            text: 'تهنئة خاصة مني لك',
+          })
+        } catch (err) {
+          if ((err as Error).name !== 'AbortError') {
+            console.error("Share failed", err)
+          }
+        }
+      } else {
+        // Fallback to download if sharing is not supported
+        handleDownload()
+      }
+    }, "image/jpeg", 0.9)
   }
 
   const filteredCards = cardsData.filter(c => c.occasion === selectedOccasion)
@@ -215,7 +242,7 @@ export default function Home() {
                   </div>
 
                   <div className="controls-container">
-                    <div className="control-group mb-4">
+                    <div className="control-group mb-3">
                       <label className="form-label fw-bold mb-2">الاسم</label>
                       <input
                         type="text"
@@ -223,41 +250,99 @@ export default function Home() {
                         value={name}
                         onChange={(e) => setName(e.target.value)}
                         placeholder="اكتب الاسم هنا"
-                        style={{ textAlign: 'right' }}
+                        style={{ textAlign: 'right', borderRadius: '12px', height: '3rem' }}
                       />
                     </div>
 
-                    <div className="control-group mb-3">
-                      <label className="form-label d-flex justify-content-between align-items-center mb-2">
-                        <span className="fw-bold">حجم الخط</span>
-                        <span className="badge bg-secondary rounded-pill px-3 py-2" style={{ direction: 'ltr' }}>{fontSize}px</span>
-                      </label>
-                      <input
-                        type="range"
-                        className="form-range"
-                        min="50"
-                        max="400"
-                        step="5"
-                        value={fontSize}
-                        onChange={(e) => setFontSize(parseInt(e.target.value))}
-                      />
+                    {/* Compact Font Size Stepper */}
+                    <div className="control-group mb-4">
+                      <div className="d-flex align-items-center justify-content-between p-2 px-3 bg-light border" style={{ borderRadius: '16px' }}>
+                        <button
+                          type="button"
+                          className="btn btn-sm d-flex align-items-center justify-content-center"
+                          style={{ width: '36px', height: '36px', borderRadius: '10px', background: '#fff' }}
+                          onClick={() => setFontSize(Math.max(40, fontSize - 5))}
+                        >
+                          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                        </button>
+                        <span className="fw-bold fs-5 text-dark">{fontSize}px</span>
+                        <button
+                          type="button"
+                          className="btn btn-sm d-flex align-items-center justify-content-center"
+                          style={{ width: '36px', height: '36px', borderRadius: '10px', background: '#fff' }}
+                          onClick={() => setFontSize(Math.min(70, fontSize + 5))}
+                        >
+                          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                        </button>
+                      </div>
+                    </div>
+
+                    <div className="share-section mb-4 text-center">
+                      <p className="text-muted small fw-bold mb-3 text-uppercase tracking-wider">شارك تهنئتك مع أحبابك</p>
+                      <div className="d-flex justify-content-center align-items-center gap-4">
+                        <div className="d-flex flex-column align-items-center gap-1">
+                          <button type="button" className="btn p-0 border-0 shadow-sm share-btn-pop"
+                            onClick={() => {
+                              const text = encodeURIComponent("لقد صممت لك بطاقة تهنئة! صمم بطاقتك الآن: " + window.location.href);
+                              window.open(`https://wa.me/?text=${text}`, '_blank');
+                            }}
+                            style={{ width: '52px', height: '52px', borderRadius: '15px', background: 'linear-gradient(135deg, #25d366 0%, #128c7e 100%)', color: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z" /></svg>
+                          </button>
+                          <span className="text-muted extra-small fw-bold">واتساب</span>
+                        </div>
+
+                        <div className="d-flex flex-column align-items-center gap-1">
+                          <button type="button" className="btn p-0 border-0 shadow-sm share-btn-pop"
+                            onClick={() => {
+                              const text = encodeURIComponent("لقد صممت لك بطاقة تهنئة! #عيد_مبارك");
+                              const url = encodeURIComponent(window.location.href);
+                              window.open(`https://twitter.com/intent/tweet?text=${text}&url=${url}`, '_blank');
+                            }}
+                            style={{ width: '52px', height: '52px', borderRadius: '15px', background: 'linear-gradient(135deg, #444 0%, #000 100%)', color: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" /></svg>
+                          </button>
+                          <span className="text-muted extra-small fw-bold">تويتر</span>
+                        </div>
+
+                        {/* Copy Link / General Share */}
+                        <div className="d-flex flex-column align-items-center gap-1">
+                          <button type="button" className="btn p-0 border-0 shadow-sm share-btn-pop" onClick={handleShare}
+                            style={{ width: '52px', height: '52px', borderRadius: '15px', background: 'linear-gradient(135deg, #6366f1 0%, #4f46e5 100%)', color: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                            <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><circle cx="18" cy="5" r="3"></circle><circle cx="6" cy="12" r="3"></circle><circle cx="18" cy="19" r="3"></circle><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line></svg>
+                          </button>
+                          <span className="text-muted extra-small fw-bold">مشاركة</span>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="d-grid gap-2">
+                      <button
+                        type="button"
+                        className="btn w-100 d-flex align-items-center justify-content-center text-center"
+                        onClick={handleDownload}
+                        style={{
+                          height: '3.75rem',
+                          borderRadius: '16px',
+                          background: '#1e293b',
+                          color: 'white',
+                          border: 'none',
+                          fontWeight: '700',
+                          fontSize: '1.25rem',
+                          textAlign: 'center'
+                        }}
+                      >
+                        <span style={{ width: '100%' }}>حفظ</span>
+                      </button>
+                      <button
+                        type="button"
+                        className="btn btn-secondary mt-3 w-100"
+                        onClick={() => setStep("card")}
+                      >
+                        رجوع
+                      </button>
                     </div>
                   </div>
-
-                  <button
-                    type="button"
-                    className="btn btn-primary w-100 mt-4"
-                    onClick={handleDownload}
-                  >
-                    تحميل البطاقة
-                  </button>
-                  <button
-                    type="button"
-                    className="btn btn-secondary mt-3 w-100"
-                    onClick={() => setStep("card")}
-                  >
-                    رجوع
-                  </button>
                 </div>
               )}
 
@@ -271,7 +356,7 @@ export default function Home() {
             </div>
           </div>
         </div>
-      </section>
-    </div>
+      </section >
+    </div >
   )
 }
