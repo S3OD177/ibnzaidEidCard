@@ -15,18 +15,18 @@ export const cardsData: Card[] = [
     {
         id: 1,
         title: " ",
-        imgLink: "https://saud.imgix.net/cardsImg/bg1-2.jpg",
+        imgLink: "/cardsImg/bg1-2.jpg",
         x: null,
-        y: 3000,
+        y: 3055,
         width: null,
         height: null,
-        txtSize: 150,
+        txtSize: 115,
         occasion: "عيد الأضحى"
     },
     {
         id: 2,
         title: " ",
-        imgLink: "https://saud.imgix.net/cardsImg/eidf1.jpeg",
+        imgLink: "/cardsImg/eidf1.jpeg",
         x: null,
         y: 950,
         width: null,
@@ -37,7 +37,7 @@ export const cardsData: Card[] = [
     {
         id: 3,
         title: " ",
-        imgLink: "https://saud.imgix.net/cardsImg/ram1.jpeg",
+        imgLink: "/cardsImg/ram1.jpeg",
         x: null,
         y: 950,
         width: null,
@@ -48,7 +48,7 @@ export const cardsData: Card[] = [
     {
         id: 4,
         title: "",
-        imgLink: "https://saud.imgix.net/cardsImg/ram2.jpeg",
+        imgLink: "/cardsImg/ram2.jpeg",
         x: null,
         y: 755,
         width: null,
@@ -59,7 +59,7 @@ export const cardsData: Card[] = [
     {
         id: 5,
         title: " ",
-        imgLink: "https://saud.imgix.net/cardsImg/ram3.jpeg",
+        imgLink: "/cardsImg/ram3.jpeg",
         x: null,
         y: 800,
         width: null,
@@ -71,7 +71,7 @@ export const cardsData: Card[] = [
     {
         id: 6,
         title: " ",
-        imgLink: "https://saud.imgix.net/cardsImg/eidf2.jpeg",
+        imgLink: "/cardsImg/eidf2.jpeg",
         x: null,
         y: 995,
         width: null,
@@ -82,7 +82,7 @@ export const cardsData: Card[] = [
     {
         id: 7,
         title: " ",
-        imgLink: "https://saud.imgix.net/cardsImg/eidf3.jpeg",
+        imgLink: "/cardsImg/eidf3.jpeg",
         x: null,
         y: 1010,
         width: null,
@@ -93,7 +93,7 @@ export const cardsData: Card[] = [
     {
         id: 8,
         title: " ",
-        imgLink: "https://saud.imgix.net/cardsImg/eidf4.jpeg",
+        imgLink: "/cardsImg/eidf4.jpeg",
         x: null,
         y: 700,
         width: null,
@@ -104,7 +104,7 @@ export const cardsData: Card[] = [
     {
         id: 9,
         title: " ",
-        imgLink: "https://saud.imgix.net/cardsImg/eid2.jpeg",
+        imgLink: "/cardsImg/eid2.jpeg",
         x: null,
         y: 660,
         width: null,

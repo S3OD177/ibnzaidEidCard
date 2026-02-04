@@ -1,14 +1,303 @@
-@import "tailwindcss";
-
-@theme {
-  --font-sans: var(--font-almarai);
-}
-
 :root {
-  --font-almarai: 'Almarai', sans-serif;
+  --bg-color: #0c0c12;
+  --card-bg: #ffffff;
+  --primary: #2563eb;
+  --primary-hover: #1d4ed8;
+  --text-main: #1e293b;
+  --text-muted: #64748b;
+  --border-color: #e2e8f0;
+  --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+  --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+  --shadow-lg: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
 }
 
+/* Global styles */
 body {
-  font-family: var(--font-almarai);
-  @apply bg-zinc-950 text-zinc-50;
+  background: radial-gradient(circle at top, #1e293b 0%, #0c0c12 100%) !important;
+  font-family: 'Almarai', sans-serif;
+  display: flex;
+  flex-direction: row-reverse;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  margin: 0;
+  padding: 0;
+  direction: rtl !important;
+  font-size: 16px;
+  color: var(--text-main);
+}
+
+/* Main container styles */
+.mainView {
+  width: 100%;
+  max-width: 600px;
+  margin: 1.5rem;
+  padding: 0;
+  z-index: 10;
+}
+
+.mainView section {
+  background: var(--card-bg);
+  border-radius: 24px;
+  padding: 2.5rem;
+  box-shadow: var(--shadow-lg);
+  position: relative;
+  overflow: hidden;
+}
+
+/* Background pattern */
+.mainView section::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 100%;
+  height: 6px;
+  background: linear-gradient(90deg, #2563eb, #8b5cf6, #ec4899);
+}
+
+/* Logo and Header */
+.logo {
+  display: block;
+  margin: 0 auto 1.5rem;
+  width: 100px;
+  height: 100px;
+  object-fit: contain;
+  filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.1));
+}
+
+#title {
+  font-size: 1.75rem;
+  font-weight: 800;
+  text-align: center;
+  margin-bottom: 2rem;
+  background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  line-height: 1.3;
+}
+
+/* Form Styles */
+.form-group label {
+  color: var(--text-main);
+  font-weight: 600;
+  margin-bottom: 0.75rem;
+  display: block;
+  font-size: 0.95rem;
+  text-align: right;
+  width: 100%;
+}
+
+.form-control {
+  height: 3.5rem;
+  border-radius: 12px;
+  border: 2px solid var(--border-color);
+  background: #f8fafc;
+  padding: 0 1.25rem;
+  font-weight: 500;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  font-size: 1.1rem;
+  text-align: right !important;
+}
+
+.form-control:focus {
+  border-color: var(--primary);
+  background: #ffffff;
+  box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.1);
+}
+
+/* Custom Checkbox/Buttons for Occasions */
+.occasion-btn {
+  width: 100%;
+  margin-bottom: 1rem;
+  padding: 1.25rem;
+  border-radius: 16px;
+  border: 2px solid var(--border-color);
+  background: #ffffff;
+  color: var(--text-main);
+  font-weight: 700;
+  font-size: 1.1rem;
+  transition: all 0.2s;
+  cursor: pointer;
+}
+
+.occasion-btn:hover {
+  border-color: var(--primary);
+  background: #eff6ff;
+  transform: translateY(-2px);
+}
+
+.occasion-btn.selected {
+  background: var(--primary);
+  color: #ffffff;
+  border-color: var(--primary);
+  box-shadow: 0 10px 15px -3px rgba(37, 99, 235, 0.3);
+}
+
+/* Cards Grid */
+.cards-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  gap: 1rem;
+}
+
+.card-item {
+  position: relative;
+  cursor: pointer;
+  border-radius: 16px;
+  overflow: hidden;
+  border: 3px solid transparent;
+  transition: all 0.3s;
+  aspect-ratio: 3 / 4;
+}
+
+.card-item:hover {
+  transform: scale(1.03);
+}
+
+.card-item.selected {
+  border-color: var(--primary);
+  box-shadow: var(--shadow-lg);
+}
+
+.card-item img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.card-item .selected-badge {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  background: var(--primary);
+  color: white;
+  width: 24px;
+  height: 24px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.8rem;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+/* Buttons */
+.btn-primary {
+  height: 3.5rem;
+  border-radius: 14px;
+  font-weight: 700;
+  font-size: 1.1rem;
+  background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+  border: none;
+  box-shadow: 0 10px 15px -3px rgba(37, 99, 235, 0.3);
+  transition: all 0.3s;
+  width: 100% !important;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  color: white !important;
+}
+
+.btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 20px 25px -5px rgba(37, 99, 235, 0.4);
+}
+
+.btn-secondary {
+  background: transparent;
+  color: var(--text-muted);
+  font-weight: 600;
+  border: 2px solid var(--border-color);
+  margin-top: 1rem;
+  width: 100% !important;
+  border-radius: 14px;
+  height: 3.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+}
+
+.btn-secondary:hover {
+  background: #f8fafc;
+  color: var(--text-main);
+  border-color: var(--text-main);
+}
+
+/* Step 4: Customize View Styles */
+.preview-container {
+  background: #f1f5f9;
+  padding: 1rem;
+  border-radius: 20px;
+  border: 2px dashed #cbd5e1;
+}
+
+.controls-container {
+  background: #ffffff;
+}
+
+.form-range::-webkit-slider-thumb {
+  background: var(--primary) !important;
+}
+
+.form-range::-moz-range-thumb {
+  background: var(--primary) !important;
+}
+
+/* Animations */
+.fade-in {
+  animation: fadeIn 0.4s ease-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Progress indicator */
+.step-indicator {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 2rem;
+  margin-bottom: 1rem;
+  width: 100%;
+}
+
+.step-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 4px;
+  background: var(--border-color);
+  transition: all 0.3s;
+}
+
+.step-dot.active {
+  width: 24px;
+  background: var(--primary);
+}
+
+@media (max-width: 768px) {
+  .mainView {
+    margin: 0;
+  }
+
+  .mainView section {
+    border-radius: 0;
+    padding: 1.5rem;
+    min-height: 100vh;
+  }
+
+  .cards-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
 }

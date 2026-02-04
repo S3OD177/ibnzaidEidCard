@@ -1,202 +1,277 @@
 "use client"
 
-import { useState, useMemo } from "react"
+import { useState, useRef, useEffect, useCallback } from "react"
 import Image from "next/image"
 import { cardsData, type Card } from "@/data/cards"
-import { Card as UICard, CardContent, CardFooter } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { SimpleDialog } from "@/components/ui/simple-dialog"
-import { Download } from "lucide-react"
 
-// Occasions derivation
+// Using Bootstrap classes (provided via layout.tsx CDN)
+
 const OCCASIONS = [
-  { id: 1, name: "رمضان", img: "/cardsImg/ram1.jpeg" },
-  { id: 2, name: "عيد الفطر", img: "/cardsImg/eidf1.jpeg" },
-  { id: 3, name: "عيد الأضحى", img: "/cardsImg/bg1-2.jpg" },
+  { id: 1, name: "رمضان" },
+  { id: 2, name: "عيد الفطر" },
+  { id: 3, name: "عيد الأضحى" },
 ]
 
 export default function Home() {
-  const [selectedOccasion, setSelectedOccasion] = useState<string | null>(null)
-  const [selectedCard, setSelectedCard] = useState<Card | null>(null)
-  const [isModalOpen, setIsModalOpen] = useState(false)
   const [name, setName] = useState("")
-  const [isGenerating, setIsGenerating] = useState(false)
 
-  // Filter cards based on selection
-  const visibleCards = useMemo(() => {
-    if (!selectedOccasion) return []
-    return cardsData.filter((card) => card.occasion === selectedOccasion)
-  }, [selectedOccasion])
+  const [step, setStep] = useState<"name" | "occasion" | "card" | "customize">("name")
+  const [selectedCard, setSelectedCard] = useState<Card | null>(null)
+  const [posX, setPosX] = useState<number | null>(null)
+  const [posY, setPosY] = useState<number | null>(null)
+  const [fontSize, setFontSize] = useState<number>(115)
+  const [selectedOccasion, setSelectedOccasion] = useState<string | null>(null)
+  const canvasRef = useRef<HTMLCanvasElement>(null)
+  const [imageLoaded, setImageLoaded] = useState(false)
+  const imgRef = useRef<HTMLImageElement | null>(null)
 
-  const handleOccasionClick = (occasionName: string) => {
-    setSelectedOccasion(occasionName)
-    // Removed auto-scroll for simplicity, relying on react re-render
+  const handleSubmitName = (e: React.FormEvent) => {
+    e.preventDefault()
+    if (!name) return
+    setStep("occasion")
   }
 
-  const handleCardClick = (card: Card) => {
+  const handleOccasionSelect = (occ: string) => {
+    setSelectedOccasion(occ)
+    setStep("card")
+  }
+
+  const handleCardSelect = (card: Card) => {
     setSelectedCard(card)
-    setIsModalOpen(true)
+    setPosX(card.x)
+    setPosY(card.y)
+    setFontSize(card.txtSize)
+    setStep("customize")
   }
 
-  const utf8_to_b64 = (str: string) => {
-    return window.btoa(unescape(encodeURIComponent(str)))
-  }
+  const drawCanvas = useCallback(() => {
+    const canvas = canvasRef.current
+    if (!canvas || !selectedCard || !imgRef.current) return
 
-  const handleGenerate = async () => {
-    if (!selectedCard || !name) return
+    const ctx = canvas.getContext("2d")
+    if (!ctx) return
 
-    setIsGenerating(true)
-    try {
-      // Encode name
-      let encodedName = utf8_to_b64(name)
-      encodedName = encodedName.replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '')
+    const img = imgRef.current
+    canvas.width = img.naturalWidth
+    canvas.height = img.naturalHeight
 
-      const params = new URLSearchParams()
-      params.append('txt64', encodedName)
-      params.append('txt-size', selectedCard.txtSize.toString())
-      params.append('txt-align', 'center')
-      params.append('txt-font', 'AlTarikh')
-      params.append('txt-fit', 'max')
+    // Draw Background
+    ctx.drawImage(img, 0, 0)
 
-      if (selectedCard.y) params.append('txt-y', selectedCard.y.toString())
-      if (selectedCard.x) params.append('txt-x', selectedCard.x!.toString()) // x is nullable in type
-      if (selectedCard.txtColor) params.append('txt-color', selectedCard.txtColor)
+    // Draw Text
+    ctx.font = `${fontSize || 115}px Almarai, sans-serif`
+    ctx.fillStyle = selectedCard.txtColor || "#4A5456"
+    ctx.textAlign = "center"
+    ctx.textBaseline = "middle"
 
-      const imageUrl = `${selectedCard.imgLink}?${params.toString()}`
+    // Calculate Position
+    // Imgix coordinates usually put 0,0 at center or top-left? 
+    // Usually card.y is absolute from top. 
+    // card.x is horizontal. If null, we center it.
+    const x = posX !== null ? (canvas.width / 2) + posX : canvas.width / 2
+    const y = posY !== null ? posY : canvas.height / 2
 
-      const response = await fetch(imageUrl)
-      const blob = await response.blob()
-      const url = window.URL.createObjectURL(blob)
-      const a = document.createElement('a')
-      a.href = url
-      a.download = `${name}.jpg`
-      a.click()
-      window.URL.revokeObjectURL(url)
+    ctx.fillText(name || "الاسم هنا", x, y)
+  }, [selectedCard, name, posX, posY, fontSize])
 
-      setIsModalOpen(false)
-    } catch (error) {
-      console.error("Error generating image", error)
-      alert("حدث خطأ أثناء إنشاء الصورة")
-    } finally {
-      setIsGenerating(false)
+  useEffect(() => {
+    if (step === "customize" && selectedCard) {
+      if (!imgRef.current || imgRef.current.src !== window.location.origin + selectedCard.imgLink) {
+        const img = new window.Image()
+        img.src = selectedCard.imgLink
+        img.onload = () => {
+          imgRef.current = img
+          setImageLoaded(true)
+          // Ensure fonts are loaded before drawing
+          document.fonts.ready.then(() => {
+            drawCanvas()
+          })
+        }
+      } else {
+        document.fonts.ready.then(() => {
+          drawCanvas()
+        })
+      }
     }
+  }, [step, selectedCard, name, posX, posY, fontSize, drawCanvas])
+
+  const handleDownload = () => {
+    const canvas = canvasRef.current
+    if (!canvas) return
+
+    const dataUrl = canvas.toDataURL("image/jpeg", 0.9)
+    const a = document.createElement("a")
+    a.href = dataUrl
+    a.download = `${name || "greeting"}.jpg`
+    a.click()
+    setStep("name")
   }
+
+  const filteredCards = cardsData.filter(c => c.occasion === selectedOccasion)
 
   return (
-    <main className="min-h-screen p-8 flex flex-col items-center justify-start bg-zinc-950 text-zinc-50 gap-12">
-
-      {/* Header */}
-      <div className="text-center space-y-4 max-w-2xl">
-        <Image
-          src="/logo.png"
-          alt="Logo"
-          width={180}
-          height={180}
-          className="mx-auto drop-shadow-2xl"
-          priority
-        />
-        <h1 className="text-3xl font-bold tracking-tight lg:text-4xl text-transparent bg-clip-text bg-gradient-to-r from-zinc-200 to-zinc-500">
-          صمم بطاقة التهنئة الخاصة بك
-        </h1>
-        <p className="text-zinc-400">اختر المناسبة، ثم البطاقة، واكتب اسمك.</p>
-      </div>
-
-      {/* 1. Occasion Selector */}
-      {!selectedOccasion && (
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 w-full max-w-4xl animate-in fade-in slide-in-from-bottom-4 duration-700">
-          {OCCASIONS.map((occ) => (
-            <div
-              key={occ.id}
-              onClick={() => handleOccasionClick(occ.name)}
-              className="group cursor-pointer relative overflow-hidden rounded-xl border border-zinc-800 bg-zinc-900/50 hover:border-zinc-700 transition-all hover:scale-105"
-            >
-              <div className="aspect-video relative">
-                <Image src={occ.img} alt={occ.name} fill className="object-cover opacity-60 group-hover:opacity-100 transition-opacity" />
-              </div>
-              <div className="p-4 text-center">
-                <h3 className="font-semibold text-lg">{occ.name}</h3>
-              </div>
-            </div>
-          ))}
-        </div>
-      )}
-
-      {/* 2. Card Grid */}
-      {selectedOccasion && (
-        <div className="w-full max-w-6xl space-y-6 animate-in fade-in slide-in-from-bottom-8 duration-700">
-          <div className="flex justify-between items-center">
-            <Button variant="ghost" onClick={() => setSelectedOccasion(null)}>← رجوع للمناسبات</Button>
-            <h2 className="text-2xl font-bold">{selectedOccasion}</h2>
-          </div>
-
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-            {visibleCards.map((card) => (
-              <UICard
-                key={card.id}
-                className="cursor-pointer overflow-hidden group hover:border-zinc-600 transition-all hover:shadow-2xl hover:shadow-zinc-900/50"
-                onClick={() => handleCardClick(card)}
-              >
-                <div className="aspect-[2/3] relative">
-                  <Image
-                    src={card.imgLink}
-                    alt={card.title}
-                    fill
-                    className="object-cover transition-transform group-hover:scale-110 duration-500"
-                    unoptimized // Imgix urls
-                  />
+    <div className="mainView" dir="rtl">
+      <section>
+        <div className="container">
+          <div className="row">
+            <div className="col-md-12">
+              <div className="position-relative">
+                <div className="text-center mb-5">
+                  <img className="logo" src="/logo.png" alt="logo" draggable="false" />
+                  <h4 id="title" className="mt-4">
+                    {step === "name" && "صمم بطاقة التهنئة الخاصة بك في أقل من دقيقة"}
+                    {step === "occasion" && "اختر المناسبة"}
+                    {step === "card" && "اختر التصميم"}
+                    {step === "customize" && selectedCard && `تعديل التصميم #${selectedCard.id}`}
+                  </h4>
                 </div>
-                <CardFooter className="p-4 justify-center bg-zinc-900/80 backdrop-blur-sm">
-                  <span className="text-sm font-medium">اختر هذا التصميم</span>
-                </CardFooter>
-              </UICard>
-            ))}
-          </div>
-        </div>
-      )}
+              </div>
 
-      {/* 3. Modal */}
-      <SimpleDialog
-        open={isModalOpen}
-        onOpenChange={setIsModalOpen}
-        title="أكمل بيانات البطاقة"
-      >
-        <div className="space-y-6 py-4">
-          {selectedCard && (
-            <div className="relative aspect-[3/2] w-full rounded-md overflow-hidden border border-zinc-700">
-              <Image src={selectedCard.imgLink} alt="Preview" fill className="object-cover" unoptimized />
+              {/* Step 1: Name Input */}
+              {step === "name" && (
+                <div className="row fade-in">
+                  <div className="col-md-12">
+                    <form onSubmit={handleSubmitName}>
+                      <div className="form-group">
+                        <label htmlFor="name">الاسم</label>
+                        <input
+                          type="text"
+                          className="form-control"
+                          id="name"
+                          placeholder="اكتب اسمك هنا"
+                          required
+                          value={name}
+                          onChange={(e) => setName(e.target.value)}
+                        />
+                      </div>
+                      <button type="submit" className="btn btn-primary mt-4">
+                        <span>التالي</span>
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ transform: "rotate(180deg)" }}><path d="m9 18 6-6-6-6" /></svg>
+                      </button>
+                    </form>
+                  </div>
+                </div>
+              )}
+
+              {/* Step 2: Occasion Selection */}
+              {step === "occasion" && (
+                <div className="d-flex flex-column gap-2 fade-in">
+                  {OCCASIONS.map(occ => (
+                    <button
+                      key={occ.id}
+                      className="occasion-btn"
+                      onClick={() => handleOccasionSelect(occ.name)}
+                    >
+                      {occ.name}
+                    </button>
+                  ))}
+                  <button
+                    type="button"
+                    className="btn btn-secondary mt-3"
+                    onClick={() => setStep("name")}
+                  >
+                    رجوع
+                  </button>
+                </div>
+              )}
+
+              {/* Step 3: Card Selection */}
+              {step === "card" && (
+                <div className="fade-in">
+                  <div className="row">
+                    {filteredCards.map(card => (
+                      <div key={card.id} className="col-6 mb-3">
+                        <div className="card-item" onClick={() => handleCardSelect(card)}>
+                          <Image
+                            src={card.imgLink!}
+                            alt="card"
+                            width={300}
+                            height={400}
+                            className="img-fluid"
+                            unoptimized
+                          />
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                  <button
+                    type="button"
+                    className="btn btn-secondary mt-3 w-100"
+                    onClick={() => setStep("occasion")}
+                  >
+                    رجوع
+                  </button>
+                </div>
+              )}
+
+              {/* Step 4: Customize Design */}
+              {step === "customize" && selectedCard && (
+                <div className="fade-in">
+                  <div className="preview-container mb-4">
+                    <canvas
+                      ref={canvasRef}
+                      style={{ maxWidth: '100%', height: 'auto', borderRadius: '12px' }}
+                    />
+                  </div>
+
+                  <div className="controls-container">
+                    <div className="control-group mb-4">
+                      <label className="form-label fw-bold mb-2">الاسم</label>
+                      <input
+                        type="text"
+                        className="form-control"
+                        value={name}
+                        onChange={(e) => setName(e.target.value)}
+                        placeholder="اكتب الاسم هنا"
+                        style={{ textAlign: 'right' }}
+                      />
+                    </div>
+
+                    <div className="control-group mb-3">
+                      <label className="form-label d-flex justify-content-between align-items-center mb-2">
+                        <span className="fw-bold">حجم الخط</span>
+                        <span className="badge bg-secondary rounded-pill px-3 py-2" style={{ direction: 'ltr' }}>{fontSize}px</span>
+                      </label>
+                      <input
+                        type="range"
+                        className="form-range"
+                        min="50"
+                        max="400"
+                        step="5"
+                        value={fontSize}
+                        onChange={(e) => setFontSize(parseInt(e.target.value))}
+                      />
+                    </div>
+                  </div>
+
+                  <button
+                    type="button"
+                    className="btn btn-primary w-100 mt-4"
+                    onClick={handleDownload}
+                  >
+                    تحميل البطاقة
+                  </button>
+                  <button
+                    type="button"
+                    className="btn btn-secondary mt-3 w-100"
+                    onClick={() => setStep("card")}
+                  >
+                    رجوع
+                  </button>
+                </div>
+              )}
+
+              <div className="step-indicator">
+                <div className={`step-dot ${step === "name" ? "active" : ""}`} />
+                <div className={`step-dot ${step === "occasion" ? "active" : ""}`} />
+                <div className={`step-dot ${step === "card" ? "active" : ""}`} />
+                <div className={`step-dot ${step === "customize" ? "active" : ""}`} />
+              </div>
+
             </div>
-          )}
-
-          <div className="space-y-2">
-            <label className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
-              الاسم
-            </label>
-            <Input
-              placeholder="اكتب اسمك هنا..."
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              className="text-right"
-              autoFocus
-            />
           </div>
-
-          <Button
-            className="w-full text-md font-bold py-6 bg-white text-black hover:bg-zinc-200"
-            onClick={handleGenerate}
-            disabled={!name || isGenerating}
-          >
-            {isGenerating ? (
-              <span className="animate-pulse">جاري التصميم...</span>
-            ) : (
-              <>
-                <Download className="mr-2 h-4 w-4" /> تحميل البطاقة
-              </>
-            )}
-          </Button>
         </div>
-      </SimpleDialog>
-
-    </main>
+      </section>
+    </div>
   )
 }
