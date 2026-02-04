@@ -1,0 +1,275 @@
+/* Shadcn-inspired Variables (Zinc Dark Theme) */
+:root {
+    --background: #09090b;
+    --foreground: #fafafa;
+    --card: #09090b;
+    --card-foreground: #fafafa;
+    --popover: #09090b;
+    --popover-foreground: #fafafa;
+    --primary: #fafafa;
+    --primary-foreground: #18181b;
+    --secondary: #27272a;
+    --secondary-foreground: #fafafa;
+    --muted: #27272a;
+    --muted-foreground: #a1a1aa;
+    --accent: #27272a;
+    --accent-foreground: #fafafa;
+    --destructive: #7f1d1d;
+    --destructive-foreground: #fafafa;
+    --border: #27272a;
+    --input: #27272a;
+    --ring: #d4d4d8;
+    --radius: 0.5rem;
+}
+
+/* Global styles */
+body {
+    background-color: var(--background);
+    color: var(--foreground);
+    font-family: 'Almarai', sans-serif;
+    display: flex;
+    flex-direction: row-reverse;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    margin: 0;
+    padding: 0;
+    direction: rtl !important;
+    font-size: 16px;
+    -webkit-font-smoothing: antialiased;
+}
+
+.mainView {
+    display: flex;
+    flex-direction: row-reverse;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    padding: 20px;
+}
+
+.mainView section {
+    padding: 40px;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    width: 100%;
+    max-width: 500px;
+    /* Minimal width */
+    margin: 10px;
+}
+
+/* Typography */
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+    font-weight: 700;
+    letter-spacing: -0.025em;
+    color: var(--foreground);
+}
+
+#title {
+    font-size: 1.5rem;
+    margin-bottom: 1.5rem;
+}
+
+label {
+    font-size: 0.875rem;
+    font-weight: 500;
+    margin-bottom: 0.5rem;
+    display: block;
+    color: var(--foreground);
+}
+
+/* Logo */
+.logo {
+    display: block;
+    margin: 0 auto 2rem;
+    width: 120px;
+    height: 120px;
+    object-fit: contain;
+    /* filter: grayscale(1) invert(1); Removed to show original logo */
+    /* opacity: 0.9; */
+}
+
+/* Input Fields (Shadcn Style) */
+.form-control {
+    display: flex;
+    height: 2.5rem;
+    /* h-10 */
+    width: 100%;
+    border-radius: var(--radius);
+    border: 1px solid var(--input);
+    background-color: var(--background);
+    padding: 0.5rem 0.75rem;
+    font-size: 0.875rem;
+    color: var(--foreground);
+    transition: all 0.2s;
+}
+
+.form-control::placeholder {
+    color: var(--muted-foreground);
+}
+
+.form-control:focus {
+    outline: none;
+    border-color: var(--ring);
+    box-shadow: none;
+    background-color: var(--background);
+    color: var(--foreground);
+}
+
+/* Buttons (Shadcn Style) */
+.btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: var(--radius);
+    font-size: 0.875rem;
+    font-weight: 500;
+    height: 2.5rem;
+    /* h-10 */
+    padding-left: 1rem;
+    padding-right: 1rem;
+    transition: colors 0.2s;
+    cursor: pointer;
+    text-decoration: none;
+}
+
+.btn-primary {
+    background-color: var(--primary);
+    color: var(--primary-foreground);
+    border: 1px solid transparent;
+}
+
+.btn-primary:hover {
+    opacity: 0.9;
+    background-color: var(--primary);
+    color: var(--primary-foreground);
+    transform: none;
+    /* Remove bounce */
+}
+
+/* Secondary/Ghost Button */
+.btn-secondary {
+    background-color: var(--secondary);
+    color: var(--secondary-foreground);
+    border: none;
+}
+
+.btn-secondary:hover {
+    background-color: var(--secondary);
+    opacity: 0.8;
+}
+
+/* Success Button (used for 'Selected') */
+.btn-success {
+    background-color: var(--background);
+    color: var(--foreground);
+    border: 1px solid var(--border);
+}
+
+.btn-success:hover {
+    background-color: var(--accent);
+}
+
+/* Modal (Shadcn Dialog Style) */
+.modal-content {
+    background-color: var(--background);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+}
+
+.modal-header {
+    border-bottom: 1px solid var(--border);
+    padding: 1.5rem;
+}
+
+.modal-title {
+    font-weight: 600;
+}
+
+.modal-footer {
+    border-top: none;
+    padding: 1.5rem;
+    background: transparent;
+}
+
+.close {
+    color: var(--muted-foreground);
+    opacity: 1;
+    font-size: 1.25rem;
+}
+
+.close:hover {
+    color: var(--foreground);
+}
+
+/* Cards (Grid Items) */
+.card {
+    background-color: var(--card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    color: var(--card-foreground);
+    transition: border-color 0.2s;
+}
+
+.card:hover {
+    background-color: var(--card);
+    border-color: var(--foreground);
+    /* Modest interaction */
+    transform: none;
+}
+
+.card-title {
+    font-size: 0.875rem;
+    font-weight: 500;
+}
+
+.selected {
+    border-color: var(--foreground);
+    box-shadow: 0 0 0 1px var(--foreground);
+}
+
+/* Scrollbar for modal */
+::-webkit-scrollbar {
+    width: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+    background: var(--muted);
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: var(--muted-foreground);
+}
+
+@media (max-width: 768px) {
+    .mainView {
+        padding: 0;
+        align-items: flex-start;
+        /* Better for mobile scrolling */
+    }
+
+    .mainView section {
+        border: none;
+        /* Full width on mobile looks cleaner without border */
+        border-radius: 0;
+        background: transparent;
+        padding: 20px;
+    }
+
+    .logo {
+        width: 100px;
+        height: 100px;
+    }
+}
