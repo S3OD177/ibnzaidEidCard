@@ -27,3 +27,6 @@ pnpm-debug.log*
 
 # vercel
 .vercel
+
+# large asset backups
+_static_backup
