@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Almarai } from "next/font/google";
 import "./globals.css";
 
@@ -11,6 +11,14 @@ const almarai = Almarai({
 export const metadata: Metadata = {
   title: "بطاقات تهنئة أسرة الحليبي آل ابن زيد",
   description: "صمم بطاقة التهنئة الخاصة بك في أقل من دقيقة",
+};
+
+export const viewport: Viewport = {
+  themeColor: "#1e293b",
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 1,
+  userScalable: false,
 };
 
 export default function RootLayout({
