@@ -325,7 +325,7 @@ export default function Home() {
                           textAlign: 'center'
                         }}
                       >
-                        <span style={{ width: '100%' }}>حفظ</span>
+                        <span style={{ width: '100%' }}>تحميل البطاقة</span>
                       </button>
                       <button
                         type="button"
