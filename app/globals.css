@@ -290,30 +290,37 @@ body {
 @media (max-width: 768px) {
   .mainView {
     margin: 0;
+    padding: 1rem;
     min-height: 100vh;
     display: flex;
     align-items: center;
+    justify-content: center;
   }
 
   .mainView section {
-    border-radius: 0;
+    border-radius: 24px;
     padding: 2rem 1.5rem;
-    min-height: 100vh;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
     width: 100%;
+    min-height: auto;
+    box-shadow: var(--shadow-lg);
+    display: block;
+  }
+
+  /* Ensure the gradient top border respects the radius */
+  .mainView section::before {
+    border-top-left-radius: 24px;
+    border-top-right-radius: 24px;
   }
 
   .logo {
-    width: 80px;
-    height: 80px;
-    margin-bottom: 1rem;
+    width: 90px;
+    height: 90px;
+    margin-bottom: 1.25rem;
   }
 
   #title {
     font-size: 1.5rem;
-    margin-bottom: 2.5rem;
+    margin-bottom: 2rem;
   }
 
   .cards-grid {
