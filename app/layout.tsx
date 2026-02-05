@@ -4,6 +4,10 @@ import "./globals.css";
 export const metadata: Metadata = {
   title: "بطاقات تهنئة أسرة الحليبي آل ابن زيد",
   description: "صمم بطاقة التهنئة الخاصة بك في أقل من دقيقة",
+  icons: {
+    icon: "/logo.png",
+    apple: "/logo.png",
+  },
 };
 
 export const viewport: Viewport = {
