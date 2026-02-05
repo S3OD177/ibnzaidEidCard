@@ -22,7 +22,6 @@ export default function Home() {
   const [fontSize, setFontSize] = useState<number>(55)
   const [selectedOccasion, setSelectedOccasion] = useState<string | null>(null)
   const canvasRef = useRef<HTMLCanvasElement>(null)
-  const [imageLoaded, setImageLoaded] = useState(false)
   const imgRef = useRef<HTMLImageElement | null>(null)
 
   const handleSubmitName = (e: React.FormEvent) => {
@@ -59,7 +58,7 @@ export default function Home() {
     ctx.drawImage(img, 0, 0)
 
     // Use slider value directly as font size (40-70px)
-    ctx.font = `${fontSize}px Almarai, sans-serif`
+    ctx.font = `${fontSize}px "Almarai", "Noto Naskh Arabic", "Noto Kufi Arabic", "Geeza Pro", "Tahoma", "Arial", sans-serif`
     ctx.fillStyle = selectedCard.txtColor || "#4A5456"
     ctx.textAlign = "center"
     ctx.textBaseline = "middle"
@@ -81,7 +80,6 @@ export default function Home() {
         img.src = selectedCard.imgLink
         img.onload = () => {
           imgRef.current = img
-          setImageLoaded(true)
           // Ensure fonts are loaded before drawing
           document.fonts.ready.then(() => {
             drawCanvas()
@@ -142,7 +140,7 @@ export default function Home() {
             <div className="col-md-12">
               <div className="position-relative">
                 <div className="text-center mb-5">
-                  <img className="logo" src="/logo.png" alt="logo" draggable="false" />
+                  <Image className="logo" src="/logo.png" alt="logo" width={100} height={100} priority />
                   <h4 id="title" className="mt-4">
                     {step === "name" && "صمم بطاقة التهنئة الخاصة بك في أقل من دقيقة"}
                     {step === "occasion" && "اختر المناسبة"}

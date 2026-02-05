@@ -1,12 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import { Almarai } from "next/font/google";
 import "./globals.css";
-
-const almarai = Almarai({
-  subsets: ["arabic"],
-  weight: ["300", "400", "700", "800"],
-  variable: "--font-almarai",
-});
 
 export const metadata: Metadata = {
   title: "بطاقات تهنئة أسرة الحليبي آل ابن زيد",
@@ -32,7 +25,7 @@ export default function RootLayout({
         <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" />
         <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@mdi/font@7.2.96/css/materialdesignicons.min.css" />
       </head>
-      <body className={almarai.className}>{children}</body>
+      <body>{children}</body>
     </html>
   );
 }
