@@ -30,3 +30,6 @@ pnpm-debug.log*
 
 # large asset backups
 _static_backup
+
+# Sentry Config File
+.env.sentry-build-plugin
