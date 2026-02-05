@@ -14,7 +14,7 @@
 /* Global styles */
 body {
   background: radial-gradient(circle at top, #1e293b 0%, #0c0c12 100%) !important;
-  font-family: 'Almarai', sans-serif;
+  font-family: "Almarai", "Noto Naskh Arabic", "Noto Kufi Arabic", "Geeza Pro", "Tahoma", "Arial", sans-serif;
   display: flex;
   flex-direction: row-reverse;
   justify-content: center;
