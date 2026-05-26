@@ -57,8 +57,21 @@ export default function Home() {
     // Draw Background
     ctx.drawImage(img, 0, 0)
 
-    // Use slider value directly as font size (40-70px)
-    ctx.font = `${fontSize}px "Almarai", "Noto Naskh Arabic", "Noto Kufi Arabic", "Geeza Pro", "Tahoma", "Arial", sans-serif`
+    const fontFamily = `"Almarai", "Noto Naskh Arabic", "Noto Kufi Arabic", "Geeza Pro", "Tahoma", "Arial", sans-serif`
+    let fittedFontSize = fontSize
+    const maxTextWidth = selectedCard.width ?? canvas.width * 0.8
+    const maxTextHeight = selectedCard.height ?? Number.POSITIVE_INFINITY
+    const text = name || "الاسم هنا"
+
+    ctx.font = `${fittedFontSize}px ${fontFamily}`
+    while (
+      fittedFontSize > 20 &&
+      (ctx.measureText(text).width > maxTextWidth || fittedFontSize * 1.25 > maxTextHeight)
+    ) {
+      fittedFontSize -= 2
+      ctx.font = `${fittedFontSize}px ${fontFamily}`
+    }
+
     ctx.fillStyle = selectedCard.txtColor || "#4A5456"
     ctx.textAlign = "center"
     ctx.textBaseline = "middle"
@@ -70,7 +83,7 @@ export default function Home() {
     const x = posX !== null ? (canvas.width / 2) + posX : canvas.width / 2
     const y = posY !== null ? posY : canvas.height / 2
 
-    ctx.fillText(name || "الاسم هنا", x, y)
+    ctx.fillText(text, x, y)
   }, [selectedCard, name, posX, posY, fontSize])
 
   useEffect(() => {
@@ -131,6 +144,8 @@ export default function Home() {
   }
 
   const filteredCards = cardsData.filter(c => c.occasion === selectedOccasion)
+  const minFontSize = selectedCard?.txtSize && selectedCard.txtSize > 70 ? 70 : 40
+  const maxFontSize = selectedCard?.txtSize && selectedCard.txtSize > 70 ? 140 : 70
 
   return (
     <div className="mainView" dir="rtl">
@@ -257,7 +272,7 @@ export default function Home() {
                           type="button"
                           className="btn btn-sm d-flex align-items-center justify-content-center"
                           style={{ width: '36px', height: '36px', borderRadius: '10px', background: '#fff' }}
-                          onClick={() => setFontSize(Math.max(40, fontSize - 5))}
+                          onClick={() => setFontSize(Math.max(minFontSize, fontSize - 5))}
                         >
                           <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line></svg>
                         </button>
@@ -266,7 +281,7 @@ export default function Home() {
                           type="button"
                           className="btn btn-sm d-flex align-items-center justify-content-center"
                           style={{ width: '36px', height: '36px', borderRadius: '10px', background: '#fff' }}
-                          onClick={() => setFontSize(Math.min(70, fontSize + 5))}
+                          onClick={() => setFontSize(Math.min(maxFontSize, fontSize + 5))}
                         >
                           <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
                         </button>

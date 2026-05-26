@@ -17,9 +17,9 @@ export const cardsData: Card[] = [
         title: " ",
         imgLink: "/cardsImg/bg1-2.jpg",
         x: null,
-        y: 3055,
-        width: null,
-        height: null,
+        y: 3005,
+        width: 2100,
+        height: 180,
         txtSize: 115,
         occasion: "عيد الأضحى"
     },
